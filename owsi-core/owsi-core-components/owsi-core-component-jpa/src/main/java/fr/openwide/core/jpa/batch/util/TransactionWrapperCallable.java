@@ -1,4 +1,4 @@
-package fr.openwide.core.jpa.migration.transaction;
+package fr.openwide.core.jpa.batch.util;
 
 import java.util.concurrent.Callable;
 
@@ -30,7 +30,7 @@ public class TransactionWrapperCallable<T> implements Callable<T> {
 				try {
 					return callable.call();
 				} catch (Exception e) {
-					LOGGER.error("L'erreur suivante n'est pas traitée ; il faut obligatoirement traiter toutes les erreurs. Rollback de la transaction.", e);
+					LOGGER.error("The following error has not been caught; you *must* catch all the errors. Transaction rollback.", e);
 					transactionStatus.setRollbackOnly();
 					return null;
 				}
