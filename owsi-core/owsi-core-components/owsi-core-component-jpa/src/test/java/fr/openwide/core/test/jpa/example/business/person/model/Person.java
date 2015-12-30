@@ -32,21 +32,29 @@ import javax.persistence.InheritanceType;
 import javax.persistence.MapKeyEnumerated;
 import javax.persistence.OneToMany;
 
+import org.hibernate.search.annotations.DocumentId;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
+
 import fr.openwide.core.jpa.business.generic.model.GenericEntity;
 import fr.openwide.core.test.person.TestMetaModel;
 
 @Entity
+@Indexed
 @Inheritance(strategy = InheritanceType.JOINED)
 public class Person extends GenericEntity<Long, Person> {
 
 	private static final long serialVersionUID = -2471930493134125282L;
 
 	@Id
+	@DocumentId
 	@GeneratedValue
 	private Long id;
 
+	@Field
 	private String firstName;
 
+	@Field
 	private String lastName;
 
 	private Date creationDate;

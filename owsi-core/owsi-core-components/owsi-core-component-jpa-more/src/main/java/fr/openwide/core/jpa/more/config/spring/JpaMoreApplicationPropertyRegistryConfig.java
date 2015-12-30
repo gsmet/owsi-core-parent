@@ -27,7 +27,7 @@ public class JpaMoreApplicationPropertyRegistryConfig extends AbstractApplicatio
 		registry.registerBoolean(DATA_UPGRADE_DONE_TEMPLATE, false);
 		registry.registerBoolean(MAINTENANCE, false);
 		
-		registry.registerBoolean(MIGRATION_LOGGING_MEMORY);
+		registry.registerBoolean(MIGRATION_LOGGING_MEMORY, true);
 		
 		registry.register(
 				IMAGE_MAGICK_CONVERT_BINARY_PATH,
