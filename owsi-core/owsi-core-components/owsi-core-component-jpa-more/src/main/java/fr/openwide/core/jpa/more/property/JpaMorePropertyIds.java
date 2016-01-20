@@ -16,8 +16,6 @@ public class JpaMorePropertyIds {
 	}
 	public static final MutablePropertyId<Boolean> MAINTENANCE = new MutablePropertyId<>("maintenance");
 	
-	public static final ImmutablePropertyId<Boolean> MIGRATION_LOGGING_MEMORY = new ImmutablePropertyId<>("migration.logging.memory");
-	
 	public static final ImmutablePropertyId<File> IMAGE_MAGICK_CONVERT_BINARY_PATH = new ImmutablePropertyId<>("imageMagick.convertBinary.path");
 
 }

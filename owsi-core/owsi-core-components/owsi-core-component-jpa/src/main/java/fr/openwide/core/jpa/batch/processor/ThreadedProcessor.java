@@ -1,7 +1,5 @@
 package fr.openwide.core.jpa.batch.processor;
 
-import static fr.openwide.core.jpa.more.property.JpaMorePropertyIds.MIGRATION_LOGGING_MEMORY;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -35,7 +33,6 @@ import com.google.common.util.concurrent.MoreExecutors;
 import fr.openwide.core.jpa.batch.monitor.ProcessorMonitorContext;
 import fr.openwide.core.jpa.batch.monitor.ThreadLocalInitializingCallable;
 import fr.openwide.core.jpa.batch.util.TransactionWrapperCallable;
-import fr.openwide.core.spring.property.service.IPropertyService;
 import fr.openwide.core.spring.util.StringUtils;
 
 public class ThreadedProcessor {
@@ -65,19 +62,17 @@ public class ThreadedProcessor {
 	private final TimeUnit maxLoggingTimeUnit;
 	private final Integer maxLoggingIncrement;
 	private final Logger progressLogger;
-	
-	private final IPropertyService propertyService;
 
 	private ProcessorMonitorContext monitorContext;
 
 	public ThreadedProcessor(int threadPoolSize, int maxTotalDuration, TimeUnit maxTotalDurationUnit, int keepAliveTime,
-			TimeUnit keepAliveTimeUnit, boolean abortAllOnError, IPropertyService propertyService) {
+			TimeUnit keepAliveTimeUnit, boolean abortAllOnError) {
 		this(threadPoolSize, maxTotalDuration, maxTotalDurationUnit, keepAliveTime, keepAliveTimeUnit, abortAllOnError,
-				propertyService, null, null, null, null, null, null);
+				null, null, null, null, null, null);
 	}
 
 	public ThreadedProcessor(int threadPoolSize, int maxTotalDuration, TimeUnit maxTotalDurationUnit, int keepAliveTime,
-			TimeUnit keepAliveTimeUnit, boolean abortAllOnError, IPropertyService propertyService,
+			TimeUnit keepAliveTimeUnit, boolean abortAllOnError,
 			Integer loggingCheckIntervalTime, TimeUnit loggingCheckIntervalTimeUnit, Integer maxLoggingTime,
 			TimeUnit maxLoggingTimeUnit, Integer maxLoggingIncrement, Logger progressLogger) {
 		super();
@@ -93,7 +88,6 @@ public class ThreadedProcessor {
 		this.maxLoggingTimeUnit = maxLoggingTimeUnit;
 		this.maxLoggingIncrement = maxLoggingIncrement;
 		this.progressLogger = progressLogger;
-		this.propertyService = propertyService;
 	}
 
 	public <T> void runWithoutTransaction(String loggerContext, Collection<? extends Runnable> runnables)
@@ -277,37 +271,40 @@ public class ThreadedProcessor {
 		}
 
 		public void log(boolean force) {
-			long currentTime = System.currentTimeMillis();
-			int totalItems = monitorContext.getTotalItems().get();
-			int doneItems = monitorContext.getDoneItems().get();
-			int ignoredItems = monitorContext.getIgnoredItems().get();
-			if (force || (currentTime - lastLoggingTime) > maxLoggingTimeUnit.toMillis(maxLoggingTime)
-					|| (doneItems - lastDoneItems) > maxLoggingIncrement) {
-				Float speedSinceStart = (float) doneItems / (float) (currentTime - startTime);
-				int roundedSpeedSinceStart = Math.round(speedSinceStart * 1000);
-
-				Float speedSinceLast = (float) (doneItems - lastDoneItems) / (float) (currentTime - lastLoggingTime);
-				int roundedSpeedSinceLast = Math.round(speedSinceLast * 1000);
-
-				lastLoggingTime = currentTime;
-				lastDoneItems = doneItems;
-
+			if (progressLogger.isInfoEnabled()) {
+				long currentTime = System.currentTimeMillis();
+				int totalItems = monitorContext.getTotalItems().get();
+				int doneItems = monitorContext.getDoneItems().get();
+				int ignoredItems = monitorContext.getIgnoredItems().get();
+				if (force || (currentTime - lastLoggingTime) > maxLoggingTimeUnit.toMillis(maxLoggingTime)
+						|| (doneItems - lastDoneItems) > maxLoggingIncrement) {
+					Float speedSinceStart = (float) doneItems / (float) (currentTime - startTime);
+					int roundedSpeedSinceStart = Math.round(speedSinceStart * 1000);
+	
+					Float speedSinceLast = (float) (doneItems - lastDoneItems) / (float) (currentTime - lastLoggingTime);
+					int roundedSpeedSinceLast = Math.round(speedSinceLast * 1000);
+	
+					lastLoggingTime = currentTime;
+					lastDoneItems = doneItems;
+	
+					StringBuilder sb = new StringBuilder();
+					if (StringUtils.hasText(loggerContext)) {
+						sb.append(loggerContext).append(" - ");
+					}
+					sb.append("In progress: {} / {} ({} ignored, {} items/s since start, {} items/s since last log)");
+					progressLogger.info(sb.toString(), doneItems, totalItems - ignoredItems, ignoredItems,
+							roundedSpeedSinceStart, roundedSpeedSinceLast);
+				}
+			}
+			if (progressLogger.isDebugEnabled()) {
 				StringBuilder sb = new StringBuilder();
 				if (StringUtils.hasText(loggerContext)) {
 					sb.append(loggerContext).append(" - ");
 				}
-				sb.append("In progress: {} / {} ({} ignored, {} items/s since start, {} items/s since last log)");
-
-				if (propertyService.get(MIGRATION_LOGGING_MEMORY)) {
-					sb.append(" - Available memory: {} / {}");
-					progressLogger.info(sb.toString(), doneItems, totalItems - ignoredItems, ignoredItems,
-							roundedSpeedSinceStart, roundedSpeedSinceLast,
-							StringUtils.humanReadableByteCount(Runtime.getRuntime().freeMemory(), true),
-							StringUtils.humanReadableByteCount(Runtime.getRuntime().totalMemory(), true));
-				} else {
-					progressLogger.info(sb.toString(), doneItems, totalItems - ignoredItems, ignoredItems,
-							roundedSpeedSinceStart, roundedSpeedSinceLast);
-				}
+				sb.append("Available memory: {} / {}");
+				progressLogger.debug(sb.toString(),
+						StringUtils.humanReadableByteCount(Runtime.getRuntime().freeMemory(), true),
+						StringUtils.humanReadableByteCount(Runtime.getRuntime().totalMemory(), true));
 			}
 		}
 	}
