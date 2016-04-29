@@ -37,6 +37,7 @@ import fr.openwide.core.showcase.web.application.task.model.TaskDataProvider;
 import fr.openwide.core.showcase.web.application.util.property.ShowcaseWebappPropertyIds;
 import fr.openwide.core.showcase.web.application.util.template.MainTemplate;
 import fr.openwide.core.wicket.behavior.ClassAttributeAppender;
+import fr.openwide.core.wicket.more.condition.Condition;
 import fr.openwide.core.wicket.more.link.descriptor.IPageLinkDescriptor;
 import fr.openwide.core.wicket.more.link.descriptor.builder.LinkDescriptorBuilder;
 import fr.openwide.core.wicket.more.markup.html.basic.PlaceholderContainer;
@@ -276,7 +277,7 @@ public class TaskMainPage extends MainTemplate {
 			}
 		});
 
-		add(new PlaceholderContainer("placeholder").collectionModel(queuedTaskHoldersListModel));
+		add(new PlaceholderContainer("placeholder").condition(Condition.collectionModelNotEmpty(queuedTaskHoldersListModel)));
 		
 		// Search & porfolio
 		TaskDataProvider dataProvider = new TaskDataProvider();

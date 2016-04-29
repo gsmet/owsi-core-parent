@@ -11,8 +11,8 @@ import fr.openwide.core.basicapp.core.business.user.model.User;
 import fr.openwide.core.basicapp.core.util.binding.Bindings;
 import fr.openwide.core.basicapp.web.application.common.typedescriptor.user.UserTypeDescriptor;
 import fr.openwide.core.basicapp.web.application.navigation.link.LinkFactory;
+import fr.openwide.core.wicket.more.condition.Condition;
 import fr.openwide.core.wicket.more.link.model.PageModel;
-import fr.openwide.core.wicket.more.markup.html.basic.PlaceholderBehavior;
 import fr.openwide.core.wicket.more.model.BindingModel;
 import fr.openwide.core.wicket.more.model.GenericEntityModel;
 
@@ -42,7 +42,7 @@ public class AdministrationUserDescriptionTemplate<U extends User> extends Admin
 		add(
 				backToSourcePage,
 				typeDescriptor.administrationTypeDescriptor().portfolio().link("backToList")
-						.add(new PlaceholderBehavior().component(backToSourcePage))
+						.add(Condition.componentVisible(backToSourcePage).thenHide())
 		);
 	}
 	

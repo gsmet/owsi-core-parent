@@ -16,7 +16,6 @@ import fr.openwide.core.commons.util.functional.Predicates2;
 import fr.openwide.core.wicket.behavior.ClassAttributeAppender;
 import fr.openwide.core.wicket.markup.html.basic.CoreLabel;
 import fr.openwide.core.wicket.more.condition.Condition;
-import fr.openwide.core.wicket.more.markup.html.basic.EnclosureBehavior;
 import fr.openwide.core.wicket.more.markup.html.basic.PlaceholderContainer;
 import fr.openwide.core.wicket.more.markup.html.bootstrap.label.behavior.BootstrapColorBehavior;
 import fr.openwide.core.wicket.more.markup.html.bootstrap.label.renderer.BootstrapRenderer;
@@ -95,7 +94,7 @@ public abstract class AbstractActionColumnElementBuilder<T, L extends AbstractLi
 										.otherwise(tooltipModel)
 						),
 						new ClassAttributeAppender(cssClasses.toString()),
-						new EnclosureBehavior().condition(actionCondition)
+						actionCondition.thenShow()
 				);
 	}
 
@@ -115,22 +114,18 @@ public abstract class AbstractActionColumnElementBuilder<T, L extends AbstractLi
 		return new WebMarkupContainer(id)
 				.add(new ClassAttributeAppender(iconCssClassModel))
 				.add(
-						new EnclosureBehavior()
-								.condition(
-										Condition.predicate(iconCssClassModel, Predicates2.hasText())
-												.and(showIconCondition)
-								)
+						Condition.predicate(iconCssClassModel, Predicates2.hasText())
+								.and(showIconCondition)
+								.thenShow()
 				);
 	}
 
 	private Component getLabelComponent(String id, IBootstrapRendererModel rendererModel) {
 		return new CoreLabel("label", rendererModel)
 				.add(
-						new EnclosureBehavior()
-								.condition(
-										Condition.predicate(rendererModel, Predicates2.hasText())
-												.and(showLabelCondition)
-								)
+						Condition.predicate(rendererModel, Predicates2.hasText())
+								.and(showLabelCondition)
+								.thenShow()
 				);
 	}
 

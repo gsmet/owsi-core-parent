@@ -12,11 +12,11 @@ import fr.openwide.core.showcase.core.business.user.model.User;
 import fr.openwide.core.showcase.web.application.links.component.DynamicImageTestPanel;
 import fr.openwide.core.showcase.web.application.links.component.DynamicLinkTestPanel;
 import fr.openwide.core.showcase.web.application.util.template.MainTemplate;
+import fr.openwide.core.wicket.more.condition.Condition;
 import fr.openwide.core.wicket.more.link.descriptor.IPageLinkDescriptor;
 import fr.openwide.core.wicket.more.link.descriptor.builder.LinkDescriptorBuilder;
 import fr.openwide.core.wicket.more.link.descriptor.parameter.CommonParameters;
 import fr.openwide.core.wicket.more.link.descriptor.parameter.validator.LinkParameterValidationException;
-import fr.openwide.core.wicket.more.markup.html.basic.PlaceholderBehavior;
 import fr.openwide.core.wicket.more.model.GenericEntityModel;
 
 public abstract class LinksTemplate extends MainTemplate {
@@ -47,7 +47,7 @@ public abstract class LinksTemplate extends MainTemplate {
 		add(linkToPage1);
 		
 		add(new LinkDescriptorBuilder().pageInstance(this).validate(LinksTemplate.class).build().link("linkToThisPageInstance")
-				.add(new PlaceholderBehavior().component(linkToPage1)));
+				.add(Condition.componentVisible(linkToPage1).thenHide()));
 		
 		add(new DynamicLinkTestPanel("linkTestPanel", userModel));
 		
